@@ -83,6 +83,9 @@ def main():
         show_future_improvements()
 def show_problem_statement():
     """Display detailed problem statement with illustrations"""
+    import plotly.express as px
+    import plotly.graph_objects as go
+    import pandas as pd
     
     # Hero section with title and subtitle
     st.markdown("""
@@ -151,29 +154,18 @@ def show_problem_statement():
     col1, col2 = st.columns([2, 3])
     
     with col1:
-        # Impact breakdown with better styling
-        st.markdown("""
-        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; border-left: 5px solid #007bff;">
-            <h4 style="color: #007bff; margin-top: 0;">💸 Direct Cost Loss (40%)</h4>
-            <p>Original purchase price completely lost</p>
-            
-            <h4 style="color: #28a745; margin-top: 1rem;">📊 Lost Margin (30%)</h4>
-            <p>Potential profit never realized</p>
-            
-            <h4 style="color: #ffc107; margin-top: 1rem;">🗑️ Disposal Costs (15%)</h4>
-            <p>Additional removal and disposal fees</p>
-            
-            <h4 style="color: #dc3545; margin-top: 1rem;">⏰ Opportunity Cost (15%)</h4>
-            <p>Shelf space that could have generated profit</p>
-        </div>
-        """, unsafe_allow_html=True)
+        # Using individual info boxes instead of complex HTML
+        st.info("💸 **Direct Cost Loss (40%)**\n\nOriginal purchase price completely lost")
+        st.success("📊 **Lost Margin (30%)**\n\nPotential profit never realized")
+        st.warning("🗑️ **Disposal Costs (15%)**\n\nAdditional removal and disposal fees")
+        st.error("⏰ **Opportunity Cost (15%)**\n\nShelf space that could have generated profit")
     
     with col2:
-        # Enhanced pie chart
-        data = {
+        # Create pie chart with proper data
+        data = pd.DataFrame({
             'Category': ['Direct Cost Loss', 'Lost Margin', 'Disposal Costs', 'Opportunity Cost'],
             'Impact': [40, 30, 15, 15]
-        }
+        })
         
         fig = px.pie(
             data, 
@@ -191,17 +183,30 @@ def show_problem_statement():
         )
         st.plotly_chart(fig, use_container_width=True)
     
-    # Real-world example - CORRECTED CALCULATION
+    # Real-world example using streamlit components
     st.markdown("""
-    <div style="background: #e8f4f8; padding: 2rem; border-radius: 10px; margin: 2rem 0;">
-        <h4 style="color: #2c3e50; margin-top: 0;">🏪 Real-World Example</h4>
-        <p><strong>Store ABC:</strong> 100 units of premium yogurt ($5 retail, $3 cost each)</p>
-        <p><strong>Problem:</strong> Poor placement leads to 30% sell-through, 70 units expire</p>
-        <p><strong>Current Loss:</strong> $210 in direct costs + $35 disposal = <strong style="color: #e74c3c;">$245 total loss</strong></p>
-        <p><strong>With Shrink Sense:</strong> Early detection → Reallocate + 15% markdown → <strong style="color: #27ae60;">$52.50 loss instead of $245</strong></p>
-        <p><strong>Savings:</strong> <strong style="color: #27ae60;">$192.50 (79% loss reduction)</strong></p>
-    </div>
-    """, unsafe_allow_html=True)
+    ### 🏪 Real-World Example
+    """)
+    
+    # Using columns for better layout
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        **Store ABC Scenario:**
+        - 100 units of premium yogurt
+        - $5 retail price, $3 cost each
+        - Poor placement → 30% sell-through
+        - 70 units expire
+        """)
+    
+    with col2:
+        st.markdown("""
+        **Financial Impact:**
+        - Current Loss: $210 + $35 disposal = **$245**
+        - With Shrink Sense: **$52.50 loss**
+        - **Savings: $192.50 (79% reduction)**
+        """)
     
     st.markdown("---")
     
@@ -213,53 +218,24 @@ def show_problem_statement():
     """)
     
     # Challenge visualization with timeline
-    challenge_data = {
+    challenge_data = pd.DataFrame({
         'Days Until Expiration': [10, 7, 5, 3, 1, 0],
-        'Available Options': [5, 4, 3, 2, 1, 0],
         'Value Recovery Potential': [95, 85, 70, 50, 25, 0]
-    }
+    })
     
-    fig = go.Figure()
-    
-    # Add value recovery line
-    fig.add_trace(go.Scatter(
-        x=challenge_data['Days Until Expiration'],
-        y=challenge_data['Value Recovery Potential'],
-        mode='lines+markers',
-        name='Value Recovery %',
-        line=dict(color='#e74c3c', width=4),
-        marker=dict(size=10)
-    ))
-    
-    # Add options available line
-    fig.add_trace(go.Scatter(
-        x=challenge_data['Days Until Expiration'],
-        y=[opt * 20 for opt in challenge_data['Available Options']],  # Scale for visibility
-        mode='lines+markers',
-        name='Available Options',
-        line=dict(color='#3498db', width=3),
-        marker=dict(size=8),
-        yaxis='y2'
-    ))
-    
-    # Add zones
-    fig.add_vrect(x0=7, x1=10, fillcolor="rgba(46, 204, 113, 0.2)", annotation_text="Optimal Action Zone", line_width=0)
-    fig.add_vrect(x0=3, x1=7, fillcolor="rgba(241, 196, 15, 0.2)", annotation_text="Critical Action Zone", line_width=0)
-    fig.add_vrect(x0=0, x1=3, fillcolor="rgba(231, 76, 60, 0.2)", annotation_text="Emergency Zone", line_width=0)
-    
-    fig.update_layout(
+    fig = px.line(
+        challenge_data, 
+        x='Days Until Expiration', 
+        y='Value Recovery Potential',
         title='The Shrinking Window of Opportunity',
+        markers=True
+    )
+    
+    fig.update_traces(line=dict(color='#e74c3c', width=4), marker=dict(size=10))
+    fig.update_layout(
         xaxis_title='Days Until Expiration',
         yaxis_title='Value Recovery Potential (%)',
-        yaxis2=dict(
-            title='Available Options',
-            overlaying='y',
-            side='right',
-            range=[0, 100]
-        ),
-        height=450,
-        showlegend=True,
-        legend=dict(x=0.7, y=0.9)
+        height=400
     )
     
     st.plotly_chart(fig, use_container_width=True)
@@ -273,58 +249,42 @@ def show_problem_statement():
     **Our intelligent system transforms this challenge into opportunity through:**
     """)
     
-    # Solution features
+    # Solution features using streamlit columns
     col1, col2 = st.columns(2)
     
     with col1:
         st.markdown("""
-        <div style="background: #e8f6f3; padding: 1.5rem; border-radius: 10px; border-left: 5px solid #1abc9c;">
-            <h4 style="color: #1abc9c; margin-top: 0;">🔍 Smart Risk Assessment</h4>
-            <ul style="margin: 0;">
-                <li>Real-time expiration monitoring</li>
-                <li>Sales velocity analysis</li>
-                <li>Demand forecasting</li>
-                <li>Multi-factor risk scoring</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        #### 🔍 Smart Risk Assessment
+        - Real-time expiration monitoring
+        - Sales velocity analysis
+        - Demand forecasting
+        - Multi-factor risk scoring
+        """)
         
         st.markdown("""
-        <div style="background: #fef9e7; padding: 1.5rem; border-radius: 10px; border-left: 5px solid #f39c12; margin-top: 1rem;">
-            <h4 style="color: #f39c12; margin-top: 0;">💡 Strategic Recommendations</h4>
-            <ul style="margin: 0;">
-                <li>Optimal markdown pricing</li>
-                <li>Store reallocation analysis</li>
-                <li>Donation tax benefits</li>
-                <li>Combo strategy optimization</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        #### 💡 Strategic Recommendations
+        - Optimal markdown pricing
+        - Store reallocation analysis
+        - Donation tax benefits
+        - Combo strategy optimization
+        """)
     
     with col2:
         st.markdown("""
-        <div style="background: #eaf2ff; padding: 1.5rem; border-radius: 10px; border-left: 5px solid #3498db;">
-            <h4 style="color: #3498db; margin-top: 0;">📊 Financial Impact Analysis</h4>
-            <ul style="margin: 0;">
-                <li>Expected recovery calculations</li>
-                <li>Cost-benefit analysis</li>
-                <li>ROI projections</li>
-                <li>Margin impact assessment</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        #### 📊 Financial Impact Analysis
+        - Expected recovery calculations
+        - Cost-benefit analysis
+        - ROI projections
+        - Margin impact assessment
+        """)
         
         st.markdown("""
-        <div style="background: #f4ecf7; padding: 1.5rem; border-radius: 10px; border-left: 5px solid #9b59b6; margin-top: 1rem;">
-            <h4 style="color: #9b59b6; margin-top: 0;">🎯 Actionable Insights</h4>
-            <ul style="margin: 0;">
-                <li>Prioritized action lists</li>
-                <li>Implementation timelines</li>
-                <li>Performance tracking</li>
-                <li>Success metrics</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
+        #### 🎯 Actionable Insights
+        - Prioritized action lists
+        - Implementation timelines
+        - Performance tracking
+        - Success metrics
+        """)
     
     # Strategy comparison chart
     st.markdown("""
@@ -333,115 +293,70 @@ def show_problem_statement():
     **See how different strategies stack up in terms of value recovery:**
     """)
     
-    strategy_data = {
+    strategy_data = pd.DataFrame({
         'Strategy': ['No Action', 'Markdown Only', 'Reallocate Only', 'Reallocate + Markdown', 'Donation', 'Liquidation'],
-        'Value Recovery %': [0, 65, 75, 85, 30, 25],
-        'Risk Level': ['Critical', 'Medium', 'Low', 'Medium', 'High', 'Critical'],
-        'Implementation Speed': ['N/A', 'Fast', 'Medium', 'Medium', 'Fast', 'Slow']
-    }
+        'Value Recovery %': [0, 65, 75, 85, 30, 25]
+    })
     
-    # Create grouped bar chart
-    # fig = go.Figure()
-    
-    risk_colors = {
-        'Low': '#27ae60',
-        'Medium': '#f39c12', 
-        'High': '#e67e22',
-        'Critical': '#e74c3c',
-        'N/A': '#95a5a6'
-    }
-    
-    colors = [risk_colors[risk] for risk in strategy_data['Risk Level']]
-    
-    fig.add_trace(go.Bar(
-        x=strategy_data['Strategy'],
-        y=strategy_data['Value Recovery %'],
-        marker_color=colors,
-        text=strategy_data['Value Recovery %'],
-        texttemplate='%{text}%',
-        textposition='outside',
-        name='Value Recovery %'
-    ))
+    fig = px.bar(
+        strategy_data, 
+        x='Strategy', 
+        y='Value Recovery %',
+        title='Value Recovery by Strategy',
+        color='Value Recovery %',
+        color_continuous_scale='RdYlGn'
+    )
     
     fig.update_layout(
-        title='Value Recovery by Strategy',
         xaxis_title='Strategy',
         yaxis_title='Value Recovery (%)',
-        yaxis=dict(range=[0, 100]),
-        height=400,
-        showlegend=False
+        height=400
     )
     
     st.plotly_chart(fig, use_container_width=True)
     
-    # Business value metrics
+    # Business value metrics using streamlit metrics
     st.markdown("""
     ## 💰 Proven Business Impact
     
     **Organizations using Shrink Sense report significant improvements:**
     """)
     
-    # Metrics cards
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
-        st.markdown("""
-        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border-radius: 15px;">
-            <h2 style="margin: 0; font-size: 2.5rem;">40-60%</h2>
-            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem;"><strong>Waste Reduction</strong></p>
-            <p style="margin: 0; font-size: 0.9rem;">Less expired inventory</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric("Waste Reduction", "40-60%", "Less expired inventory")
     
     with col2:
-        st.markdown("""
-        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 15px;">
-            <h2 style="margin: 0; font-size: 2.5rem;">15-25%</h2>
-            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem;"><strong>Margin Improvement</strong></p>
-            <p style="margin: 0; font-size: 0.9rem;">On at-risk inventory</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric("Margin Improvement", "15-25%", "On at-risk inventory")
     
     with col3:
-        st.markdown("""
-        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; border-radius: 15px;">
-            <h2 style="margin: 0; font-size: 2.5rem;">5-10</h2>
-            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem;"><strong>Hours Saved</strong></p>
-            <p style="margin: 0; font-size: 0.9rem;">Per week in analysis</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric("Time Saved", "5-10 hrs/week", "In analysis")
     
     with col4:
-        st.markdown("""
-        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #e67e22, #d35400); color: white; border-radius: 15px;">
-            <h2 style="margin: 0; font-size: 2.5rem;">300%</h2>
-            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem;"><strong>ROI</strong></p>
-            <p style="margin: 0; font-size: 0.9rem;">Typical first-year ROI</p>
-        </div>
-        """, unsafe_allow_html=True)
+        st.metric("ROI", "300%", "First-year typical")
     
     # Sustainability impact
     st.markdown("""
-    <div style="background: #d5f4e6; padding: 2rem; border-radius: 10px; margin: 2rem 0;">
-        <h4 style="color: #2d8a3e; margin-top: 0;">🌱 Environmental Impact</h4>
-        <p>Beyond financial benefits, Shrink Sense contributes to sustainability goals:</p>
-        <ul>
-            <li><strong>Reduces food waste</strong> by 40-60% through better inventory management</li>
-            <li><strong>Supports circular economy</strong> through donation and reallocation strategies</li>
-            <li><strong>Minimizes landfill impact</strong> by extending product lifecycle</li>
-            <li><strong>Enhances CSR profile</strong> through responsible inventory practices</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
+    ### 🌱 Environmental Impact
+    
+    Beyond financial benefits, Shrink Sense contributes to sustainability goals:
+    - **Reduces food waste** by 40-60% through better inventory management
+    - **Supports circular economy** through donation and reallocation strategies
+    - **Minimizes landfill impact** by extending product lifecycle
+    - **Enhances CSR profile** through responsible inventory practices
+    """)
     
     # Call to action
-    st.markdown("""
-    <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 15px; margin-top: 2rem;">
-        <h3 style="margin: 0 0 1rem 0;">Ready to Transform Your Inventory Management?</h3>
-        <p style="margin: 0; font-size: 1.1rem;">Navigate to the <strong>Dashboard</strong> tab to see Shrink Sense in action!</p>
-        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Start making data-driven decisions that protect your profits and support sustainability</p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.success("""
+    ### Ready to Transform Your Inventory Management?
+    
+    Navigate to the **Dashboard** tab to see Shrink Sense in action!
+    
+    Start making data-driven decisions that protect your profits and support sustainability.
+    """)
+
+
 
 def show_dashboard():
     st.header("📊 Inventory Analysis Dashboard")
@@ -967,9 +882,9 @@ def show_logic_explanation():
     
     | Category | No Action | 15% Markdown | 25% Markdown | Reallocate | Combo Strategy | Donation | Liquidation |
     |----------|-----------|--------------|--------------|------------|----------------|----------|-------------|
-    | **Fresh Food** | 60% | 70% | 85% | 65% | **88%** | **100%** | 100% |
-    | **Perishables** | 70% | 80% | 90% | 75% | **92%** | **100%** | 100% |
-    | **General Merchandise** | 80% | 85% | 92% | 82% | **94%** | **100%** | 100% |
+    | **Fresh Food** | 60% | 70% | 85% | 65% | **88%** | **95%** | 97% |
+    | **Perishables** | 70% | 80% | 90% | 75% | **92%** | **95%** | 97% |
+    | **General Merchandise** | 80% | 85% | 92% | 82% | **94%** | **95%** | 97% |
     """)
     
     st.markdown("""
